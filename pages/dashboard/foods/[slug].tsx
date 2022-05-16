@@ -17,13 +17,29 @@ interface Props {
   group: Group
 }
 
-export default function Dashboard({ foods, group }: Props) {
-  console.log(foods, group)
+export default function Foods({ foods, group }: Props) {
   const router = useRouter()
   const [items, setItems] = useState(foods)
   const itemsRef = React.useRef(items)
 
   const changed = !isEqual(items, itemsRef.current)
+
+  async function updateOrder() {
+    try {
+      const response = await fetch("/api/food/order", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          items: items.map((x, i) => ({ ...x, order: i })),
+        }),
+      })
+      const { success } = await response.json()
+      if (success) {
+      }
+    } catch (error) {}
+  }
 
   return (
     <Container>
@@ -69,7 +85,7 @@ export default function Dashboard({ foods, group }: Props) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
           >
-            <Button>Update Order</Button>
+            <Button onClick={updateOrder}>Update order</Button>
           </motion.div>
         )}
       </AnimatePresence>
@@ -87,7 +103,10 @@ export const getServerSideProps = withAuthentication(
       const food = db.collection("recipe")
       const group = db.collection("group")
 
-      const foods = await food.find({ group: Number(slug) }).toArray()
+      const foods = await food
+        .find({ group: Number(slug) })
+        .sort("order", 1)
+        .toArray()
       const x = await group.findOne({ groupId: Number(slug) })
 
       return {

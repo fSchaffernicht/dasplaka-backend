@@ -5,5 +5,6 @@ export interface Food {
   isAvailable: boolean
   group: number
   price: number
+  order: number
   _id?: string
 }

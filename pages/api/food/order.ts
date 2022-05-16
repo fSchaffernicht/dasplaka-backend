@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import { client } from "@services"
 import { ObjectId } from "mongodb"
+import { Food } from "@types"
 
 type Data = {
   success: boolean
@@ -17,21 +18,17 @@ export default async function handler(
     const connection = await client
 
     const db = connection.db("food")
-    const group = db.collection("group")
+    const recipe = db.collection("recipe")
 
     const { items } = body
 
     await Promise.all(
-      items.map(async (item) => {
+      items.map(async (item: Food) => {
         const updateDoc = {
           $set: { order: item.order },
         }
 
-        const x = await group.updateOne(
-          { _id: new ObjectId(item._id) },
-          updateDoc
-        )
-        console.log(x)
+        await recipe.updateOne({ _id: new ObjectId(item._id) }, updateDoc)
       })
     )
 

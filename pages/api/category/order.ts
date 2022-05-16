@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import { client } from "@services"
 import { ObjectId } from "mongodb"
+import { Group } from "@types"
 
 type Data = {
   success: boolean
@@ -17,17 +18,24 @@ export default async function handler(
     const connection = await client
 
     const db = connection.db("food")
-    const recipe = db.collection("recipe")
+    const group = db.collection("group")
 
-    const { id } = body
-    console.log(id)
-    const deleted = await recipe.deleteOne({ _id: new ObjectId(id) })
-    console.log(deleted)
-    if (deleted) {
-      res.status(200).json({ success: true })
-    } else {
-      res.status(404).json({ success: false })
-    }
+    const { items } = body
+
+    await Promise.all(
+      items.map(async (item: Group) => {
+        const updateDoc = {
+          $set: { order: item.order },
+        }
+
+        const x = await group.updateOne(
+          { _id: new ObjectId(item._id) },
+          updateDoc
+        )
+      })
+    )
+
+    res.status(200).json({ success: true })
   } catch (error) {
     res.status(500).json({ success: false, error: "Something went wrong" })
   }

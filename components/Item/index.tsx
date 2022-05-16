@@ -4,12 +4,12 @@ import styles from "./Item.module.css"
 
 interface Props {
   title: string
-  description: string
+  description?: string
   info: string
-  price: number
-  isAvailable: boolean
+  price?: number
+  isAvailable?: boolean
   onClick: () => void
-  onDetails: () => void
+  onDetails?: () => void
 }
 
 export default function Item({
@@ -28,7 +28,7 @@ export default function Item({
         {isAvailable !== undefined && <Badge isActive={isAvailable} />}
       </div>
       <div className={styles.container}>
-        <div className={styles.description}>{description}</div>
+        {description && <div className={styles.description}>{description}</div>}
         <div className={styles.description}>{info}</div>
         {price && <div className={styles.price}>{price} EUR</div>}
       </div>

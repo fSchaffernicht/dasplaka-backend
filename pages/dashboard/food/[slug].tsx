@@ -21,7 +21,6 @@ export default function Food({ food, isNew, group }: Props) {
     return function (
       event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) {
-      console.log(event)
       setValue((prevState) => ({
         ...prevState,
         [key]:
@@ -34,7 +33,7 @@ export default function Food({ food, isNew, group }: Props) {
 
   async function update() {
     try {
-      const response = await fetch("/api/update-food", {
+      const response = await fetch("/api/food/update", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -53,11 +52,12 @@ export default function Food({ food, isNew, group }: Props) {
       description: value.description,
       isAvailable: Boolean(value.isAvailable),
       price: Number(value.price),
+      order: Number(value.order),
       info: value.info ?? "",
     }
 
     try {
-      const response = await fetch("/api/add-food", {
+      const response = await fetch("/api/food/add", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -73,7 +73,7 @@ export default function Food({ food, isNew, group }: Props) {
     if (!confirmDelete) return
     if (!id) return
     try {
-      const response = await fetch("/api/delete-food", {
+      const response = await fetch("/api/food/delete", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -86,8 +86,6 @@ export default function Food({ food, isNew, group }: Props) {
   }
 
   const isValid = value.title && value.price
-
-  console.log(value)
 
   return (
     <Container>

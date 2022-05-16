@@ -19,23 +19,22 @@ export default function Dashboard({ groups }: Props) {
   const [items, setItems] = useState(groups)
   const itemsRef = React.useRef(items)
 
-  const changed = !isEqual(items, itemsRef.current)
+  let changed = !isEqual(items, itemsRef.current)
 
   async function updateOrder() {
     try {
-      const response = await fetch("/api/update-order", {
+      const payload = items.map((x, i) => ({ ...x, order: i }))
+      const response = await fetch("/api/category/order", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
         },
         body: JSON.stringify({
-          items: items.map((x, i) => ({ ...x, order: i })),
+          items: payload,
         }),
       })
       const { success } = await response.json()
-      console.log("success", success)
       if (success) {
-        // itemsRef.current = items
       }
     } catch (error) {}
   }
@@ -44,16 +43,13 @@ export default function Dashboard({ groups }: Props) {
     <Container>
       <h1>Categories</h1>
       <Reorder.Group axis="y" values={items} onReorder={setItems}>
-        {items.map((group: any) => {
+        {items.map((group) => {
           return (
             <Reorder.Item key={group._id} value={group}>
               <Item
                 key={group._id}
                 title={group.title}
-                description={group.description}
                 info={group.info}
-                price={group.price}
-                isAvailable={group.isAvailable}
                 onDetails={() =>
                   router.push({
                     pathname: "dashboard/foods/[slug]",

@@ -15,9 +15,7 @@ interface Props {
 export default function Food({ food, isNew, group }: Props) {
   const [value, setValue] = useState<FoodType>(food)
   const [confirmDelete, setConfirmDelete] = useState(false)
-  const { query, push } = useRouter()
-
-  console.log(">>", food)
+  const { push } = useRouter()
 
   function handleChange(key: string) {
     return function (
@@ -32,7 +30,7 @@ export default function Food({ food, isNew, group }: Props) {
 
   async function update() {
     try {
-      const response = await fetch("/api/update-category", {
+      const response = await fetch("/api/category/update", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -51,7 +49,7 @@ export default function Food({ food, isNew, group }: Props) {
     }
 
     try {
-      const response = await fetch("/api/add-category", {
+      const response = await fetch("/api/category/add", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -67,7 +65,7 @@ export default function Food({ food, isNew, group }: Props) {
     if (!confirmDelete) return
     if (!id) return
     try {
-      const response = await fetch("/api/delete-category", {
+      const response = await fetch("/api/category/delete", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -150,8 +148,6 @@ export const getServerSideProps = withAuthentication(async ({ query }) => {
     const recipe = db.collection("group")
 
     const x = await recipe.findOne({ groupId: Number(slug) })
-
-    console.log("x", x)
 
     return {
       props: {
