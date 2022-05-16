@@ -1,0 +1,26 @@
+.item {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid lightgrey;
+}
+
+.item:hover {
+  opacity: 0.5;
+}
+
+.description,
+.price {
+  font-size: 0.75rem;
+}
+
+.price {
+  text-align: right;
+  min-width: 100px;
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

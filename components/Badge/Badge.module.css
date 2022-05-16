@@ -1,0 +1,11 @@
+.badge {
+  border-radius: 50%;
+  background: salmon;
+  color: white;
+  width: 10px;
+  height: 10px;
+}
+
+.active {
+  background: lightseagreen;
+}

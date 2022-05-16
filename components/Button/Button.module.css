@@ -1,0 +1,23 @@
+.button {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  background: black;
+  border: none;
+  outline: none;
+  color: white;
+  cursor: pointer;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.button:disabled {
+  background: grey;
+}
+
+.white {
+  background: white;
+  color: black;
+}
