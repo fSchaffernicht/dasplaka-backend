@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs"
 import { client } from "@services"
 
 const jwtKey = process.env.JWT_SECRET ?? ""
-const jwtExpirySeconds = 300
+const jwtExpirySeconds = 300 * 10
 
 type Data = {
   name?: string
@@ -20,7 +20,7 @@ export default async function handler(
   try {
     const { body } = req
 
-    const connection = await client.connect()
+    const connection = await client
 
     const db = connection.db("user")
     const admin = db.collection("admin")

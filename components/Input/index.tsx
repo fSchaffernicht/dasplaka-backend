@@ -1,5 +1,6 @@
 import { Label } from "@components"
 import styles from "./Input.module.css"
+import classNames from "classnames"
 
 interface Props extends React.HTMLProps<HTMLInputElement> {
   label?: string
@@ -7,7 +8,11 @@ interface Props extends React.HTMLProps<HTMLInputElement> {
 }
 
 export default function Input({ onChange, label, ...rest }: Props) {
-  const input = <input className={styles.input} onChange={onChange} {...rest} />
+  const classes = classNames(styles.input, {
+    [styles.checkbox]: rest.type === "checkbox",
+  })
+
+  const input = <input className={classes} onChange={onChange} {...rest} />
 
   if (label) {
     return (

@@ -17,17 +17,16 @@ export default async function handler(
     const connection = await client
 
     const db = connection.db("food")
-    const recipe = db.collection("recipe")
+    const recipe = db.collection("group")
 
-    const { _id, ...rest } = body
+    const { id } = body
+    const deleted = await recipe.deleteOne({ _id: new ObjectId(id) })
 
-    const updateDoc = {
-      $set: { ...rest },
+    if (deleted) {
+      res.status(200).json({ success: true })
+    } else {
+      res.status(404).json({ success: false })
     }
-
-    await recipe.updateOne({ _id: new ObjectId(body._id) }, updateDoc)
-
-    res.status(200).json({ success: true })
   } catch (error) {
     res.status(500).json({ success: false, error: "Something went wrong" })
   }

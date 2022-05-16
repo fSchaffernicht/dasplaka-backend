@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import { client } from "@services"
-import { ObjectId } from "mongodb"
 
 type Data = {
   success: boolean
@@ -17,15 +16,11 @@ export default async function handler(
     const connection = await client
 
     const db = connection.db("food")
-    const recipe = db.collection("recipe")
+    const group = db.collection("group")
 
-    const { _id, ...rest } = body
+    const [highest] = await group.find().sort("groupId", -1).limit(1).toArray()
 
-    const updateDoc = {
-      $set: { ...rest },
-    }
-
-    await recipe.updateOne({ _id: new ObjectId(body._id) }, updateDoc)
+    await group.insertOne({ ...body, groupId: highest.groupId + 1, order: -1 })
 
     res.status(200).json({ success: true })
   } catch (error) {

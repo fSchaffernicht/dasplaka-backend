@@ -17,15 +17,23 @@ export default async function handler(
     const connection = await client
 
     const db = connection.db("food")
-    const recipe = db.collection("recipe")
+    const group = db.collection("group")
 
-    const { _id, ...rest } = body
+    const { items } = body
 
-    const updateDoc = {
-      $set: { ...rest },
-    }
+    await Promise.all(
+      items.map(async (item) => {
+        const updateDoc = {
+          $set: { order: item.order },
+        }
 
-    await recipe.updateOne({ _id: new ObjectId(body._id) }, updateDoc)
+        const x = await group.updateOne(
+          { _id: new ObjectId(item._id) },
+          updateDoc
+        )
+        console.log(x)
+      })
+    )
 
     res.status(200).json({ success: true })
   } catch (error) {

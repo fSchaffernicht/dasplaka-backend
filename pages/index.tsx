@@ -42,11 +42,13 @@ const Home: NextPage = () => {
           <Input
             type="text"
             value={name}
+            name="name"
             onChange={(event) => setName(event.target.value)}
           />
           <Input
             type="password"
             value={password}
+            name="password"
             onChange={(event) => setPassword(event.target.value)}
           />
 

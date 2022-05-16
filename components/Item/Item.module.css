@@ -1,17 +1,17 @@
 .item {
   margin-bottom: 1rem;
-  padding-bottom: 1rem;
+  padding: 1rem;
   cursor: pointer;
-  border-bottom: 1px solid lightgrey;
-}
-
-.item:hover {
-  opacity: 0.5;
+  border: 1px solid lightgrey;
 }
 
 .description,
 .price {
   font-size: 0.75rem;
+}
+
+.description {
+  margin-bottom: 1rem;
 }
 
 .price {
@@ -23,4 +23,15 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.button {
+  margin: 0;
+  padding: 0.5rem 2rem;
+  font-size: 0.75rem;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
 }

@@ -11,3 +11,7 @@
   border: 1px solid lightblue;
   outline: 2px solid lightblue;
 }
+
+.checkbox {
+  width: auto;
+}

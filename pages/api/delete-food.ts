@@ -14,7 +14,7 @@ export default async function handler(
   try {
     const { body } = req
 
-    const connection = await client.connect()
+    const connection = await client
 
     const db = connection.db("food")
     const recipe = db.collection("recipe")
