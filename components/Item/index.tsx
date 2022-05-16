@@ -28,8 +28,12 @@ export default function Item({
         {isAvailable !== undefined && <Badge isActive={isAvailable} />}
       </div>
       <div className={styles.container}>
-        {description && <div className={styles.description}>{description}</div>}
-        <div className={styles.description}>{info}</div>
+        <div>
+          {description && (
+            <div className={styles.description}>{description}</div>
+          )}
+          <div className={styles.description}>{info}</div>
+        </div>
         {price && <div className={styles.price}>{price} EUR</div>}
       </div>
       <div className={styles["button-container"]}>

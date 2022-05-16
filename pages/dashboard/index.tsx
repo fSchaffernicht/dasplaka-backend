@@ -1,6 +1,6 @@
 import { Reorder } from "framer-motion"
 import jwt from "jsonwebtoken"
-import React, { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { client, withAuthentication } from "@services"
 import { Button, Container, Item } from "@components"
 import { useRouter } from "next/router"
@@ -17,9 +17,13 @@ interface Props {
 export default function Dashboard({ groups }: Props) {
   const router = useRouter()
   const [items, setItems] = useState(groups)
-  const itemsRef = React.useRef(items)
+  const itemsRef = useRef(items)
+  const [changed, setChanged] = useState(!isEqual(items, itemsRef.current))
 
-  let changed = !isEqual(items, itemsRef.current)
+  useEffect(() => {
+    setChanged(!isEqual(items, itemsRef.current))
+    itemsRef.current = items
+  }, [items])
 
   async function updateOrder() {
     try {
@@ -35,6 +39,8 @@ export default function Dashboard({ groups }: Props) {
       })
       const { success } = await response.json()
       if (success) {
+        itemsRef.current = items
+        setChanged(!isEqual(items, itemsRef.current))
       }
     } catch (error) {}
   }

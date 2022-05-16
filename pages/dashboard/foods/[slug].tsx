@@ -1,11 +1,10 @@
 import { Reorder } from "framer-motion"
 import jwt from "jsonwebtoken"
-import React, { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { client, withAuthentication } from "@services"
 import { Button, Container, Item } from "@components"
 import { useRouter } from "next/router"
 import { Food, Group } from "@types"
-import groupBy from "lodash.groupby"
 import { NEW } from "@constants"
 import isEqual from "lodash.isequal"
 import { motion, AnimatePresence } from "framer-motion"
@@ -20,23 +19,30 @@ interface Props {
 export default function Foods({ foods, group }: Props) {
   const router = useRouter()
   const [items, setItems] = useState(foods)
-  const itemsRef = React.useRef(items)
+  const itemsRef = useRef(items)
+  const [changed, setChanged] = useState(!isEqual(items, itemsRef.current))
 
-  const changed = !isEqual(items, itemsRef.current)
+  useEffect(() => {
+    setChanged(!isEqual(items, itemsRef.current))
+    itemsRef.current = items
+  }, [items])
 
   async function updateOrder() {
     try {
-      const response = await fetch("/api/food/order", {
+      const payload = items.map((x, i) => ({ ...x, order: i }))
+      const response = await fetch("/api/category/order", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
         },
         body: JSON.stringify({
-          items: items.map((x, i) => ({ ...x, order: i })),
+          items: payload,
         }),
       })
       const { success } = await response.json()
       if (success) {
+        itemsRef.current = items
+        setChanged(!isEqual(items, itemsRef.current))
       }
     } catch (error) {}
   }
