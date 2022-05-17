@@ -40,7 +40,7 @@ export default function Timer({ user = {} }: Props) {
       const left = Math.floor(Number(localUser?.exp))
       setTime(left - now)
     },
-    localUser ? 1000 : null
+    localUser?.exp ? 1000 : null
   )
 
   useEffect(() => {
@@ -58,7 +58,6 @@ export default function Timer({ user = {} }: Props) {
       })
       const { user: userWithNewToken } = await response.json()
       if (userWithNewToken) {
-        console.log(userWithNewToken)
         setLocalUser(userWithNewToken)
       }
     } catch (error) {}

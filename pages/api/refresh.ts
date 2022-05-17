@@ -1,8 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import jwt from "jsonwebtoken"
 import cookie from "cookie"
-import bcrypt from "bcryptjs"
-import { client } from "@services"
 
 const jwtKey = process.env.JWT_SECRET ?? ""
 const jwtExpirySeconds = 300
@@ -24,9 +22,8 @@ export default async function handler(
     return res.status(401).end()
   }
 
-  var payload
   try {
-    payload = jwt.verify(token, jwtKey)
+    jwt.verify(token, jwtKey)
   } catch (e) {
     if (e instanceof jwt.JsonWebTokenError) {
       return res.status(401).end()
@@ -40,8 +37,6 @@ export default async function handler(
     algorithm: "HS256",
     expiresIn: jwtExpirySeconds,
   })
-
-  console.log("new token", newToken)
 
   res.setHeader(
     "Set-Cookie",

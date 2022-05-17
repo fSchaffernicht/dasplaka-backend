@@ -38,6 +38,7 @@ const Home: NextPage = () => {
       </Head>
       <Container>
         <h1>Login</h1>
+        <p>Speak friend and enter!</p>
         <form onSubmit={handleSubmit}>
           <Input
             type="text"
@@ -53,6 +54,7 @@ const Home: NextPage = () => {
           />
 
           <Button
+            isFullWidth
             disabled={name.length === 0 || password.length === 0}
             type="submit"
           >
