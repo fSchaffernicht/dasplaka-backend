@@ -28,10 +28,7 @@ export default async function handler(
           $set: { order: item.order },
         }
 
-        const x = await group.updateOne(
-          { _id: new ObjectId(item._id) },
-          updateDoc
-        )
+        await group.updateOne({ _id: new ObjectId(item._id) }, updateDoc)
       })
     )
 

@@ -73,31 +73,29 @@ export default function Dashboard({ groups }: Props) {
           )
         })}
       </Reorder.Group>
-
-      <Button
-        isFullWidth
-        onClick={() =>
-          router.push({
-            pathname: "dashboard/category/[slug]",
-            query: { slug: NEW.CATEGORY, group: "key" },
-          })
-        }
-      >
-        + Add new entry
-      </Button>
-      <AnimatePresence>
-        {changed && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-          >
-            <Button isFullWidth onClick={updateOrder}>
-              Update Order
-            </Button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <Button
+          onClick={() =>
+            router.push({
+              pathname: "dashboard/category/[slug]",
+              query: { slug: NEW.CATEGORY, group: "key" },
+            })
+          }
+        >
+          Add new entry
+        </Button>
+        <AnimatePresence>
+          {changed && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <Button onClick={updateOrder}>Update Order</Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </Container>
   )
 }

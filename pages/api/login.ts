@@ -44,6 +44,8 @@ export default async function handler(
           cookie.serialize("token", String(token), {
             path: "/", // path needs to be set in order to persist cookie
             maxAge: jwtExpirySeconds * 1000,
+            secure: process.env.NODE_ENV !== "development",
+            httpOnly: true,
           })
         )
 

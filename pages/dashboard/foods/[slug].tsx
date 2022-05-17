@@ -2,7 +2,7 @@ import { Reorder } from "framer-motion"
 import jwt from "jsonwebtoken"
 import { useEffect, useRef, useState } from "react"
 import { client, withAuthentication } from "@services"
-import { Button, Container, Item } from "@components"
+import { Button, Container, Item, Summary } from "@components"
 import { useRouter } from "next/router"
 import { Food, Group } from "@types"
 import { NEW } from "@constants"
@@ -30,7 +30,7 @@ export default function Foods({ foods, group }: Props) {
   async function updateOrder() {
     try {
       const payload = items.map((x, i) => ({ ...x, order: i }))
-      const response = await fetch("/api/category/order", {
+      const response = await fetch("/api/food/order", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -51,6 +51,11 @@ export default function Foods({ foods, group }: Props) {
     <Container>
       <Link href="/dashboard">{`<- Back to Dashboard`}</Link>
       <h1>{group?.title}</h1>
+      <Summary
+        count={items.length}
+        info="Use drag and drop to reorder items."
+      />
+
       <Reorder.Group axis="y" values={items} onReorder={setItems}>
         {items.map((food) => {
           return (
@@ -65,7 +70,10 @@ export default function Foods({ foods, group }: Props) {
                 onClick={() =>
                   router.push({
                     pathname: "../food/[slug]",
-                    query: { slug: food.title, group: group.groupId },
+                    query: {
+                      slug: food.title,
+                      group: group.groupId,
+                    },
                   })
                 }
               />
@@ -73,28 +81,33 @@ export default function Foods({ foods, group }: Props) {
           )
         })}
       </Reorder.Group>
-      <Button
-        isFullWidth
-        onClick={() =>
-          router.push({
-            pathname: "../food/[slug]",
-            query: { slug: NEW.FOOD, group: group.groupId },
-          })
-        }
-      >
-        + Add new food
-      </Button>
-      <AnimatePresence>
-        {changed && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-          >
-            <Button onClick={updateOrder}>Update order</Button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <Button
+          onClick={() =>
+            router.push({
+              pathname: "../food/[slug]",
+              query: {
+                slug: NEW.FOOD,
+                group: group.groupId,
+                newOrder: items.length + 1,
+              },
+            })
+          }
+        >
+          Add new food
+        </Button>
+        <AnimatePresence>
+          {changed && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <Button onClick={updateOrder}>Update order</Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </Container>
   )
 }
@@ -106,20 +119,20 @@ export const getServerSideProps = withAuthentication(
       const connection = await client
 
       const db = connection.db("food")
-      const food = db.collection("recipe")
+      const recipe = db.collection("recipe")
       const group = db.collection("group")
 
-      const foods = await food
+      const foods = await recipe
         .find({ group: Number(slug) })
         .sort("order", 1)
         .toArray()
-      const x = await group.findOne({ groupId: Number(slug) })
+      const category = await group.findOne({ groupId: Number(slug) })
 
       return {
         props: {
           user,
           foods: JSON.parse(JSON.stringify(foods)),
-          group: JSON.parse(JSON.stringify(x)),
+          group: JSON.parse(JSON.stringify(category)),
         },
       }
     } catch (e) {

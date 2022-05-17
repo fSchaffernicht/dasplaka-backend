@@ -52,7 +52,7 @@ export default function Food({ food, isNew, group }: Props) {
       description: value.description,
       isAvailable: Boolean(value.isAvailable),
       price: Number(value.price),
-      order: Number(value.order),
+      order: Number(query.newOrder),
       info: value.info ?? "",
     }
 
