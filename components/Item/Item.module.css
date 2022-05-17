@@ -1,8 +1,42 @@
 .item {
   margin-bottom: 1rem;
   padding: 1rem;
-  cursor: grab;
+  padding-left: 3rem;
   border: 1px solid lightgrey;
+  background: white;
+  position: relative;
+}
+
+.drag {
+  width: 30px;
+  height: 100%;
+  background: #f7f7f7;
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: grab;
+  touch-action: pan-x;
+}
+
+.drag:before {
+  content: "";
+  position: absolute;
+  width: 50%;
+  height: 1px;
+  background: grey;
+  top: calc(50% - 3px);
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.drag:after {
+  content: "";
+  position: absolute;
+  width: 50%;
+  height: 1px;
+  background: grey;
+  top: calc(50% + 3px);
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .description,

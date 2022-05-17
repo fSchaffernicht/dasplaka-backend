@@ -1,4 +1,4 @@
-import { Reorder } from "framer-motion"
+import { Reorder, useDragControls } from "framer-motion"
 import jwt from "jsonwebtoken"
 import { useEffect, useRef, useState } from "react"
 import { client, withAuthentication } from "@services"
@@ -49,35 +49,28 @@ export default function Foods({ foods, group }: Props) {
 
   return (
     <Container>
-      <Link href="/dashboard">{`<- Back to Dashboard`}</Link>
+      <Link href="/categories">{`<- Back to Categories`}</Link>
       <h1>{group?.title}</h1>
       <Summary
         count={items.length}
         info="Use drag and drop to reorder items."
       />
-
       <Reorder.Group axis="y" values={items} onReorder={setItems}>
         {items.map((food) => {
           return (
-            <Reorder.Item key={food._id} value={food}>
-              <Item
-                key={food._id}
-                title={food.title}
-                description={food.description}
-                info={food.info}
-                price={food.price}
-                isAvailable={food.isAvailable}
-                onClick={() =>
-                  router.push({
-                    pathname: "../food/[slug]",
-                    query: {
-                      slug: food.title,
-                      group: group.groupId,
-                    },
-                  })
-                }
-              />
-            </Reorder.Item>
+            <DragItem
+              key={food._id}
+              food={food}
+              onClick={() =>
+                router.push({
+                  pathname: "../food/[slug]",
+                  query: {
+                    slug: food.title,
+                    group: group.groupId,
+                  },
+                })
+              }
+            />
           )
         })}
       </Reorder.Group>
@@ -109,6 +102,30 @@ export default function Foods({ foods, group }: Props) {
         </AnimatePresence>
       </div>
     </Container>
+  )
+}
+
+function DragItem({ food, onClick }: { food: Food; onClick: () => void }) {
+  const controls = useDragControls()
+
+  return (
+    <Reorder.Item
+      key={food._id}
+      value={food}
+      dragListener={false}
+      dragControls={controls}
+    >
+      <Item
+        onPointerDown={(e) => controls.start(e)}
+        key={food._id}
+        title={food.title}
+        description={food.description}
+        info={food.info}
+        price={food.price}
+        isAvailable={food.isAvailable}
+        onClick={onClick}
+      />
+    </Reorder.Item>
   )
 }
 

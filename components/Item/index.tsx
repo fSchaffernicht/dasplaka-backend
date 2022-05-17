@@ -10,6 +10,7 @@ interface Props {
   isAvailable?: boolean
   onClick: () => void
   onDetails?: () => void
+  onPointerDown?: (event: React.MouseEvent | React.TouchEvent) => void
 }
 
 export default function Item({
@@ -20,9 +21,11 @@ export default function Item({
   isAvailable,
   onClick,
   onDetails,
+  onPointerDown,
 }: Props) {
   return (
     <div className={styles.item}>
+      <div onPointerDown={onPointerDown} className={styles.drag} />
       <div className={styles.container}>
         <div>{title}</div>
         {isAvailable !== undefined && <Badge isActive={isAvailable} />}

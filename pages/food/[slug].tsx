@@ -15,7 +15,7 @@ interface Props {
 export default function Food({ food, isNew, group }: Props) {
   const [value, setValue] = useState<FoodType>(food)
   const [confirmDelete, setConfirmDelete] = useState(false)
-  const { push } = useRouter()
+  const { query, push } = useRouter()
 
   function handleChange(key: string) {
     return function (
@@ -23,14 +23,17 @@ export default function Food({ food, isNew, group }: Props) {
     ) {
       setValue((prevState) => ({
         ...prevState,
-        [key]: key === "isAvailable" ? !event.target.value : event.target.value,
+        [key]:
+          event.target.type === "checkbox" && "checked" in event.target
+            ? event.target?.checked
+            : event.target.value,
       }))
     }
   }
 
   async function update() {
     try {
-      const response = await fetch("/api/category/update", {
+      const response = await fetch("/api/food/update", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -38,18 +41,23 @@ export default function Food({ food, isNew, group }: Props) {
         body: JSON.stringify({ ...value }),
       })
       const { success } = await response.json()
-      if (success) push(`/dashboard`)
+      if (success) push(`/foods/${group}`)
     } catch (error) {}
   }
 
   async function save() {
-    const payload = {
+    const payload: FoodType = {
+      group: Number(query.group),
       title: value.title,
+      description: value.description,
+      isAvailable: Boolean(value.isAvailable),
+      price: Number(value.price),
+      order: Number(query.newOrder),
       info: value.info ?? "",
     }
 
     try {
-      const response = await fetch("/api/category/add", {
+      const response = await fetch("/api/food/add", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -57,7 +65,7 @@ export default function Food({ food, isNew, group }: Props) {
         body: JSON.stringify({ ...payload }),
       })
       const { success } = await response.json()
-      if (success) push(`/dashboard`)
+      if (success) push(`/foods/${group}`)
     } catch (error) {}
   }
 
@@ -65,7 +73,7 @@ export default function Food({ food, isNew, group }: Props) {
     if (!confirmDelete) return
     if (!id) return
     try {
-      const response = await fetch("/api/category/delete", {
+      const response = await fetch("/api/food/delete", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -73,15 +81,15 @@ export default function Food({ food, isNew, group }: Props) {
         body: JSON.stringify({ id }),
       })
       const { success } = await response.json()
-      if (success) push(`/dashboard`)
+      if (success) push(`/foods/${group}`)
     } catch (error) {}
   }
 
-  const isValid = value.title
+  const isValid = value.title && value.price
 
   return (
     <Container>
-      <Link href={`/dashboard`}>{`<- Back to categories`}</Link>
+      <Link href={`/foods/${group}`}>{`<- Back to foods`}</Link>
       <div style={{ marginBottom: "4rem" }} />
       <Input
         label="title"
@@ -90,11 +98,31 @@ export default function Food({ food, isNew, group }: Props) {
         onChange={handleChange("title")}
       />
       <Textarea
+        rows={5}
+        label="description"
+        value={value.description}
+        onChange={handleChange("description")}
+      />
+      <Input
+        label="price"
+        type="number"
+        value={value.price}
+        onChange={handleChange("price")}
+      />
+      <Textarea
         rows={2}
         label="info"
         value={value.info}
         onChange={handleChange("info")}
       />
+      <div>
+        <Input
+          label="is available"
+          type="checkbox"
+          checked={value.isAvailable}
+          onChange={handleChange("isAvailable")}
+        />
+      </div>
       <div>
         {isNew ? (
           <Button isFullWidth disabled={!isValid} onClick={save}>
@@ -123,38 +151,42 @@ export default function Food({ food, isNew, group }: Props) {
   )
 }
 
-export const getServerSideProps = withAuthentication(async ({ query }) => {
-  const { slug, group } = query
+export const getServerSideProps = withAuthentication(
+  async ({ query }, user) => {
+    const { slug, group } = query
 
-  if (slug === NEW.CATEGORY) {
-    return {
-      props: {
-        group: group,
-        isNew: true,
-        food: {
-          description: "",
-          title: "",
-          price: "",
-          isAvailable: true,
+    if (slug === NEW.FOOD) {
+      return {
+        props: {
+          group: group,
+          isNew: true,
+          food: {
+            description: "",
+            title: "",
+            price: "",
+            isAvailable: true,
+          },
         },
-      },
+      }
+    }
+
+    try {
+      const connection = await client
+
+      const db = connection.db("food")
+      const recipe = db.collection("recipe")
+
+      const x = await recipe.findOne({ title: slug })
+
+      return {
+        props: {
+          user,
+          group: group,
+          food: JSON.parse(JSON.stringify(x)),
+        },
+      }
+    } catch (e) {
+      console.log(e)
     }
   }
-
-  try {
-    const connection = await client
-
-    const db = connection.db("food")
-    const recipe = db.collection("group")
-
-    const x = await recipe.findOne({ groupId: Number(slug) })
-
-    return {
-      props: {
-        food: JSON.parse(JSON.stringify(x)),
-      },
-    }
-  } catch (e) {
-    console.log(e)
-  }
-})
+)

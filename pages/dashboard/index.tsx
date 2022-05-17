@@ -2,117 +2,76 @@ import { Reorder } from "framer-motion"
 import jwt from "jsonwebtoken"
 import { useEffect, useRef, useState } from "react"
 import { client, withAuthentication } from "@services"
-import { Button, Container, Item } from "@components"
+import { Button, Container, Box, Modal, Summary } from "@components"
 import { useRouter } from "next/router"
 import { Group } from "@types"
 import { NEW } from "@constants"
 import isEqual from "lodash.isequal"
 import { motion, AnimatePresence } from "framer-motion"
+import Link from "next/link"
+import styles from "./Dashboard.module.css"
 
 interface Props {
   user: jwt.JwtPayload
   groups: Group[]
 }
 
-export default function Dashboard({ groups }: Props) {
+export default function Dashboard({ user }: Props) {
+  const [triggerBuild, setTriggerBuild] = useState(false)
   const router = useRouter()
-  const [items, setItems] = useState(groups)
-  const itemsRef = useRef(items)
-  const [changed, setChanged] = useState(!isEqual(items, itemsRef.current))
 
-  useEffect(() => {
-    setChanged(!isEqual(items, itemsRef.current))
-    itemsRef.current = items
-  }, [items])
-
-  async function updateOrder() {
-    try {
-      const payload = items.map((x, i) => ({ ...x, order: i }))
-      const response = await fetch("/api/category/order", {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify({
-          items: payload,
-        }),
-      })
-      const { success } = await response.json()
-      if (success) {
-        itemsRef.current = items
-        setChanged(!isEqual(items, itemsRef.current))
-      }
-    } catch (error) {}
+  function deploy() {
+    // after promise resolve setTriggerBuild = false
   }
 
   return (
     <Container>
-      <h1>Categories</h1>
-      <Reorder.Group axis="y" values={items} onReorder={setItems}>
-        {items.map((group) => {
-          return (
-            <Reorder.Item key={group._id} value={group}>
-              <Item
-                key={group._id}
-                title={group.title}
-                info={group.info}
-                onDetails={() =>
-                  router.push({
-                    pathname: "dashboard/foods/[slug]",
-                    query: { slug: group.groupId },
-                  })
-                }
-                onClick={() =>
-                  router.push({
-                    pathname: "dashboard/category/[slug]",
-                    query: { slug: group.groupId },
-                  })
-                }
-              />
-            </Reorder.Item>
-          )
-        })}
-      </Reorder.Group>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <Button
-          onClick={() =>
-            router.push({
-              pathname: "dashboard/category/[slug]",
-              query: { slug: NEW.CATEGORY, group: "key" },
-            })
-          }
-        >
-          Add new entry
-        </Button>
-        <AnimatePresence>
-          {changed && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              <Button onClick={updateOrder}>Update Order</Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+      <h1>Dashboard</h1>
+
+      <div className={styles.grid}>
+        <Box
+          onClick={() => router.push("../categories")}
+          title="Categories"
+          text="Sort, edit, delete or add new categories or foods"
+        />
+        <Box
+          onClick={() => router.push("../message")}
+          title="Custom message"
+          text="Create a custom message with a fixed time period"
+        />
+        <Box
+          onClick={() => setTriggerBuild(true)}
+          title="Deploy"
+          text="Trigger build to see latest database changes on dasplaka.de"
+        />
+
+        <Box title="Logout" onClick={console.log} />
+        <Modal isVisible={triggerBuild}>
+          <Container>
+            <h1>Are you done with all of your changes?</h1>
+            <p>
+              This action will trigger a new build for dasplaka.de. It can take
+              a couple of minutes before you see your changes live. Grab a
+              coffee!
+            </p>
+            <Button isFullWidth onClick={() => setTriggerBuild(false)}>
+              No
+            </Button>
+            <Button isFullWidth onClick={deploy}>
+              Deploy now
+            </Button>
+          </Container>
+        </Modal>
       </div>
     </Container>
   )
 }
 
-export const getServerSideProps = withAuthentication(async ({ req }, user) => {
+export const getServerSideProps = withAuthentication(async (context, user) => {
   try {
-    const connection = await client
-
-    const db = connection.db("food")
-    const group = db.collection("group")
-
-    const groups = await group.find().sort("order", 1).toArray()
-
     return {
       props: {
         user,
-        groups: JSON.parse(JSON.stringify(groups)),
       },
     }
   } catch (e) {

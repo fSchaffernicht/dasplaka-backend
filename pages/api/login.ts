@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs"
 import { client } from "@services"
 
 const jwtKey = process.env.JWT_SECRET ?? ""
-const jwtExpirySeconds = 300 * 10
+const jwtExpirySeconds = 300
 
 type Data = {
   name?: string

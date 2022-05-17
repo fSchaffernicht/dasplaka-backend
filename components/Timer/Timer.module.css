@@ -1,0 +1,15 @@
+.timer {
+  background: black;
+  color: white;
+  padding: 1rem;
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  cursor: pointer;
+  z-index: 999;
+}
+
+.timer:hover {
+  background: grey;
+}

@@ -1,0 +1,15 @@
+.box {
+  background: #f7f7f7;
+  padding: 1rem;
+  width: 100%;
+  cursor: pointer;
+}
+
+.box:hover {
+  background: lightgrey;
+}
+
+.title {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
