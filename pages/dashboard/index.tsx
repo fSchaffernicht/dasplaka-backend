@@ -1,23 +1,26 @@
-import jwt from "jsonwebtoken"
 import { useState } from "react"
 import { withAuthentication } from "@services"
-import { Button, Container, Box, Modal, Summary } from "@components"
+import { Button, Container, Box, Modal } from "@components"
 import { useRouter } from "next/router"
-import { Group } from "@types"
 
 import styles from "./Dashboard.module.css"
 
-interface Props {
-  user: jwt.JwtPayload
-  groups: Group[]
-}
-
-export default function Dashboard({ user }: Props) {
+export default function Dashboard() {
   const [triggerBuild, setTriggerBuild] = useState(false)
   const router = useRouter()
 
   function deploy() {
     // after promise resolve setTriggerBuild = false
+  }
+
+  async function logout() {
+    try {
+      const response = await fetch("/api/logout")
+      const { success } = await response.json()
+      if (success) {
+        router.push("/")
+      }
+    } catch (error) {}
   }
 
   return (
@@ -41,7 +44,7 @@ export default function Dashboard({ user }: Props) {
           text="Trigger build to see latest database changes on dasplaka.de"
         />
 
-        <Box title="Logout" onClick={console.log} />
+        <Box title="Logout" onClick={logout} />
         <Modal isVisible={triggerBuild}>
           <Container>
             <h1>Are you done with all of your changes?</h1>

@@ -5,7 +5,7 @@ import Timer from "components/Timer"
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
-      <Timer user={pageProps.user} />
+      {pageProps.user && <Timer user={pageProps.user} />}
       <Component {...pageProps} />
     </>
   )

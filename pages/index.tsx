@@ -22,7 +22,7 @@ const Home: NextPage = () => {
       })
       const result = await response.json()
 
-      if (result.name) Router.push("/dashboard")
+      if (result.user) Router.push("/dashboard")
       else if (result.error) setError(result.error)
       else setError("Something went wrong")
     }
@@ -61,8 +61,8 @@ const Home: NextPage = () => {
             submit
           </Button>
         </form>
+        {error && <div>error</div>}
       </Container>
-      {error && JSON.stringify(error)}
     </>
   )
 }

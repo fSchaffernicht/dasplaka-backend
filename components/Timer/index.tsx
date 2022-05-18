@@ -1,6 +1,7 @@
+import { SESSION_TIME, WARNING_TIME } from "@constants"
 import jwt from "jsonwebtoken"
 import { useRouter } from "next/router"
-import { useEffect, useLayoutEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import styles from "./Timer.module.css"
 
 interface Props {
@@ -32,19 +33,27 @@ function useInterval(callback: () => void, delay: number | null) {
 export default function Timer({ user = {} }: Props) {
   const router = useRouter()
   const [localUser, setLocalUser] = useState(user)
-  const [time, setTime] = useState(300)
+  const [time, setTime] = useState(SESSION_TIME)
+
+  useEffect(() => {
+    if (user.user) setLocalUser(user)
+  }, [user])
 
   useInterval(
     () => {
       const now = Math.floor(new Date().getTime() / 1000)
+
       const left = Math.floor(Number(localUser?.exp))
       setTime(left - now)
     },
-    localUser?.exp ? 1000 : null
+    localUser.user ? 1000 : null
   )
 
   useEffect(() => {
-    if (time < 0) router.push("/")
+    if (time <= 0) {
+      router.push("/")
+      setLocalUser({})
+    }
   }, [time, router])
 
   async function renew() {
@@ -71,10 +80,10 @@ export default function Timer({ user = {} }: Props) {
     seconds: seconds < 10 ? `0${seconds}` : seconds,
   }
 
-  if (time < 60 && time >= 0) {
+  if (time < WARNING_TIME && time >= 0) {
     return (
       <div className={styles.timer} onClick={renew}>
-        {`Yo! Your Token expires in ${timeString.minutes}:${timeString.seconds} seconds. Click to renew!`}
+        {`Yo! Your token expires in ${timeString.minutes}:${timeString.seconds} seconds. Click to renew!`}
       </div>
     )
   }

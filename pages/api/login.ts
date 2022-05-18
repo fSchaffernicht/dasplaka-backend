@@ -3,13 +3,12 @@ import jwt from "jsonwebtoken"
 import cookie from "cookie"
 import bcrypt from "bcryptjs"
 import { client } from "@services"
+import { SESSION_TIME } from "@constants"
 
 const jwtKey = process.env.JWT_SECRET ?? ""
-const jwtExpirySeconds = 300
 
 type Data = {
-  name?: string
-  password?: string
+  user?: any
   error?: string
 }
 
@@ -36,20 +35,22 @@ export default async function handler(
         // and which expires 300 seconds after issue
         const token = jwt.sign({ user: body.name }, jwtKey, {
           algorithm: "HS256",
-          expiresIn: jwtExpirySeconds,
+          expiresIn: SESSION_TIME,
         })
 
         res.setHeader(
           "Set-Cookie",
           cookie.serialize("token", String(token), {
             path: "/", // path needs to be set in order to persist cookie
-            maxAge: jwtExpirySeconds * 1000,
+            maxAge: SESSION_TIME * 1000,
             secure: process.env.NODE_ENV !== "development",
             httpOnly: true,
           })
         )
 
-        res.status(301).json(JSON.stringify(user) as any)
+        const user = jwt.verify(token, jwtKey)
+
+        res.status(200).json({ user })
       } else {
         res.status(401).json({ error: "User or password is not correct" })
       }
@@ -57,6 +58,7 @@ export default async function handler(
       res.status(401).json({ error: "User or password is not correct" })
     }
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: "Something went wrong" })
   }
 }
