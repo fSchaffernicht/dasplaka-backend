@@ -15,7 +15,7 @@ interface Props {
 export default function Food({ food, isNew, group }: Props) {
   const [value, setValue] = useState<FoodType>(food)
   const [confirmDelete, setConfirmDelete] = useState(false)
-  const { push } = useRouter()
+  const { push, query } = useRouter()
 
   function handleChange(key: string) {
     return function (
@@ -61,7 +61,7 @@ export default function Food({ food, isNew, group }: Props) {
     } catch (error) {}
   }
 
-  async function deleteFood(id?: string) {
+  async function onDelete(id?: string) {
     if (!confirmDelete) return
     if (!id) return
     try {
@@ -70,7 +70,7 @@ export default function Food({ food, isNew, group }: Props) {
         headers: {
           "Content-type": "application/json",
         },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({ id, group: query.slug }),
       })
       const { success } = await response.json()
       if (success) push(`/categories`)
@@ -114,7 +114,7 @@ export default function Food({ food, isNew, group }: Props) {
           <Button isFullWidth onClick={() => setConfirmDelete(false)}>
             No
           </Button>
-          <Button isFullWidth onClick={() => deleteFood(food._id)}>
+          <Button isFullWidth onClick={() => onDelete(food._id)}>
             Yes
           </Button>
         </Container>
@@ -130,6 +130,7 @@ export const getServerSideProps = withAuthentication(
     if (slug === NEW.CATEGORY) {
       return {
         props: {
+          user,
           group: group,
           isNew: true,
           food: {

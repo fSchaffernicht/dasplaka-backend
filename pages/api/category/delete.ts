@@ -7,6 +7,8 @@ type Data = {
   error?: string
 }
 
+// TODO: Delete all foods belonging to category
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
@@ -17,10 +19,15 @@ export default async function handler(
     const connection = await client
 
     const db = connection.db("food")
-    const recipe = db.collection("group")
+    const category = db.collection("group")
+    const food = db.collection("recipe")
 
-    const { id } = body
-    const deleted = await recipe.deleteOne({ _id: new ObjectId(id) })
+    const { id, group } = body
+
+    const deleted = await category.deleteOne({ _id: new ObjectId(id) })
+
+    // Get all foods belonging to category and delete them
+    await food.deleteMany({ group: Number(group) })
 
     if (deleted) {
       res.status(200).json({ success: true })
