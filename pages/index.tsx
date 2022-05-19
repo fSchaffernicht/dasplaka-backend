@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react"
-import { Input, Button, Container } from "@components"
+import { Input, Button, Container, Alert } from "@components"
 import type { NextPage } from "next"
 import Head from "next/head"
 import { useRouter } from "next/router"
@@ -26,13 +26,13 @@ const Home: NextPage = () => {
       })
       const result = await response.json()
 
-      setIsLoading(false)
-
       if (result.user) {
         push("/dashboard")
       } else if (result.error) {
+        setIsLoading(false)
         setError(result.error)
       } else {
+        setIsLoading(false)
         setError("Something went wrong")
       }
     }
@@ -72,7 +72,7 @@ const Home: NextPage = () => {
             Login
           </Button>
         </form>
-        {error && <div>error</div>}
+        {error && <Alert type="error" text={error} />}
       </Container>
     </>
   )

@@ -1,16 +1,23 @@
 import { useState } from "react"
 import { withAuthentication } from "@services"
-import { Button, Container, Box, Modal } from "@components"
+import { Button, Container, Box, Modal, Alert } from "@components"
 import { useRouter } from "next/router"
 
 import styles from "./Dashboard.module.css"
+import { Response } from "@types"
 
 export default function Dashboard() {
+  const [result, setResult] = useState<Response>()
   const [triggerBuild, setTriggerBuild] = useState(false)
   const router = useRouter()
 
-  function deploy() {
-    // after promise resolve setTriggerBuild = false
+  async function deploy() {
+    try {
+      const response = await fetch("/api/build")
+      const result = await response.json()
+      setResult(result)
+      setTriggerBuild(false)
+    } catch (error) {}
   }
 
   async function logout() {
@@ -62,6 +69,7 @@ export default function Dashboard() {
           </Container>
         </Modal>
       </div>
+      {result && <Alert type={result[0]} text={result[1]} />}
     </Container>
   )
 }

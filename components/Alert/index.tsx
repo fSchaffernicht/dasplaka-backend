@@ -10,5 +10,10 @@ interface Props {
 
 export default function Alert({ text, type = "info" }: Props) {
   const classes = classNames(styles.alert, [styles[type]])
-  return <div className={classes}>{text}</div>
+  return (
+    <div className={classes}>
+      <div className={styles["info-block"]}>i</div>
+      <div className={styles["text-block"]}>{text}</div>
+    </div>
+  )
 }
