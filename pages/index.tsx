@@ -2,17 +2,21 @@ import { FormEvent, useState } from "react"
 import { Input, Button, Container } from "@components"
 import type { NextPage } from "next"
 import Head from "next/head"
-import Router from "next/router"
+import { useRouter } from "next/router"
 
 const Home: NextPage = () => {
+  const [isLoading, setIsLoading] = useState(false)
   const [name, setName] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
+  const { push } = useRouter()
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     async function send() {
+      setIsLoading(true)
+
       const response = await fetch("/api/login", {
         method: "POST",
         headers: {
@@ -22,9 +26,15 @@ const Home: NextPage = () => {
       })
       const result = await response.json()
 
-      if (result.user) Router.push("/dashboard")
-      else if (result.error) setError(result.error)
-      else setError("Something went wrong")
+      setIsLoading(false)
+
+      if (result.user) {
+        push("/dashboard")
+      } else if (result.error) {
+        setError(result.error)
+      } else {
+        setError("Something went wrong")
+      }
     }
 
     if (name && password) send()
@@ -57,8 +67,9 @@ const Home: NextPage = () => {
             isFullWidth
             disabled={name.length === 0 || password.length === 0}
             type="submit"
+            isLoading={isLoading}
           >
-            submit
+            Login
           </Button>
         </form>
         {error && <div>error</div>}

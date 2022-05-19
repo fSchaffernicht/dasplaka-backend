@@ -6,6 +6,7 @@ interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isFullWidth?: boolean
   white?: boolean
   className?: string
+  isLoading?: boolean
 }
 
 export default function Button({
@@ -13,6 +14,7 @@ export default function Button({
   isFullWidth = false,
   white,
   className,
+  isLoading,
   ...rest
 }: Props) {
   const classes = classNames(
@@ -26,7 +28,7 @@ export default function Button({
 
   return (
     <button className={classes} {...rest}>
-      {children}
+      {!isLoading ? children : "Loading ..."}
     </button>
   )
 }
