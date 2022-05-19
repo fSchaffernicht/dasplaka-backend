@@ -18,7 +18,7 @@ export default async function handler(
     const connection = await client
 
     const db = connection.db("food")
-    const group = db.collection("group")
+    const categories = db.collection("categories")
 
     const { items } = body
 
@@ -28,7 +28,7 @@ export default async function handler(
           $set: { order: item.order },
         }
 
-        await group.updateOne({ _id: new ObjectId(item._id) }, updateDoc)
+        await categories.updateOne({ _id: new ObjectId(item._id) }, updateDoc)
       })
     )
 

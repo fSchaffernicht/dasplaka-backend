@@ -17,12 +17,12 @@ export default async function handler(
     const connection = await client
 
     const db = connection.db("food")
-    const recipe = db.collection("recipe")
+    const foods = db.collection("foods")
 
     const { id } = body
-    const deleted = await recipe.deleteOne({ _id: new ObjectId(id) })
+    const deleted = await foods.deleteOne({ _id: new ObjectId(id) })
 
-    if (deleted) {
+    if (deleted.acknowledged) {
       res.status(200).json({ success: true })
     } else {
       res.status(404).json({ success: false })

@@ -16,11 +16,19 @@ export default async function handler(
     const connection = await client
 
     const db = connection.db("food")
-    const group = db.collection("group")
+    const categories = db.collection("categories")
 
-    const [highest] = await group.find().sort("groupId", -1).limit(1).toArray()
+    const [highest] = await categories
+      .find()
+      .sort("groupId", -1)
+      .limit(1)
+      .toArray()
 
-    await group.insertOne({ ...body, groupId: highest.groupId + 1, order: -1 })
+    await categories.insertOne({
+      ...body,
+      groupId: highest.groupId + 1,
+      order: -1,
+    })
 
     res.status(200).json({ success: true })
   } catch (error) {

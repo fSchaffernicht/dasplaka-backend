@@ -136,19 +136,20 @@ export const getServerSideProps = withAuthentication(
       const connection = await client
 
       const db = connection.db("food")
-      const recipe = db.collection("recipe")
-      const group = db.collection("group")
+      const foods = db.collection("foods")
+      const categories = db.collection("categories")
 
-      const foods = await recipe
+      const data = await foods
         .find({ group: Number(slug) })
         .sort("order", 1)
         .toArray()
-      const category = await group.findOne({ groupId: Number(slug) })
+
+      const category = await categories.findOne({ groupId: Number(slug) })
 
       return {
         props: {
           user,
-          foods: JSON.parse(JSON.stringify(foods)),
+          foods: JSON.parse(JSON.stringify(data)),
           group: JSON.parse(JSON.stringify(category)),
         },
       }

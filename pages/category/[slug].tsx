@@ -9,10 +9,9 @@ import { useRouter } from "next/router"
 interface Props {
   food: FoodType
   isNew: boolean
-  group: number
 }
 
-export default function Food({ food, isNew, group }: Props) {
+export default function Food({ food, isNew }: Props) {
   const [value, setValue] = useState<FoodType>(food)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const { push, query } = useRouter()
@@ -147,14 +146,14 @@ export const getServerSideProps = withAuthentication(
       const connection = await client
 
       const db = connection.db("food")
-      const recipe = db.collection("group")
+      const categories = db.collection("categories")
 
-      const x = await recipe.findOne({ groupId: Number(slug) })
+      const data = await categories.findOne({ groupId: Number(slug) })
 
       return {
         props: {
           user,
-          food: JSON.parse(JSON.stringify(x)),
+          food: JSON.parse(JSON.stringify(data)),
         },
       }
     } catch (e) {

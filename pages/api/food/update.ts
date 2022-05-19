@@ -17,7 +17,7 @@ export default async function handler(
     const connection = await client
 
     const db = connection.db("food")
-    const recipe = db.collection("recipe")
+    const foods = db.collection("foods")
 
     const { _id, ...rest } = body
 
@@ -25,7 +25,7 @@ export default async function handler(
       $set: { ...rest },
     }
 
-    await recipe.updateOne({ _id: new ObjectId(body._id) }, updateDoc)
+    await foods.updateOne({ _id: new ObjectId(body._id) }, updateDoc)
 
     res.status(200).json({ success: true })
   } catch (error) {

@@ -12,12 +12,12 @@ import Link from "next/link"
 
 interface Props {
   user: jwt.JwtPayload
-  groups: Group[]
+  categories: Group[]
 }
 
-export default function Dashboard({ groups }: Props) {
+export default function Dashboard({ categories }: Props) {
   const router = useRouter()
-  const [items, setItems] = useState(groups)
+  const [items, setItems] = useState(categories)
   const itemsRef = useRef(items)
   const [changed, setChanged] = useState(!isEqual(items, itemsRef.current))
 
@@ -55,21 +55,21 @@ export default function Dashboard({ groups }: Props) {
         info="Use drag and drop to reorder items."
       />
       <Reorder.Group axis="y" values={items} onReorder={setItems}>
-        {items.map((group) => {
+        {items.map((category) => {
           return (
             <DragItem
-              key={group._id}
-              group={group}
+              key={category._id}
+              category={category}
               onDetails={() =>
                 router.push({
                   pathname: "../foods/[slug]",
-                  query: { slug: group.groupId },
+                  query: { slug: category.groupId },
                 })
               }
               onClick={() =>
                 router.push({
                   pathname: "../category/[slug]",
-                  query: { slug: group.groupId },
+                  query: { slug: category.groupId },
                 })
               }
             />
@@ -104,11 +104,11 @@ export default function Dashboard({ groups }: Props) {
 }
 
 function DragItem({
-  group,
+  category,
   onClick,
   onDetails,
 }: {
-  group: Group
+  category: Group
   onClick: () => void
   onDetails: () => void
 }) {
@@ -116,16 +116,16 @@ function DragItem({
 
   return (
     <Reorder.Item
-      key={group._id}
-      value={group}
+      key={category._id}
+      value={category}
       dragListener={false}
       dragControls={controls}
     >
       <Item
         onPointerDown={(e) => controls.start(e)}
-        key={group._id}
-        title={group.title}
-        info={group.info}
+        key={category._id}
+        title={category.title}
+        info={category.info}
         onDetails={onDetails}
         onClick={onClick}
       />
@@ -138,14 +138,14 @@ export const getServerSideProps = withAuthentication(async ({ req }, user) => {
     const connection = await client
 
     const db = connection.db("food")
-    const group = db.collection("group")
+    const categories = db.collection("categories")
 
-    const groups = await group.find().sort("order", 1).toArray()
+    const data = await categories.find().sort("order", 1).toArray()
 
     return {
       props: {
         user,
-        groups: JSON.parse(JSON.stringify(groups)),
+        categories: JSON.parse(JSON.stringify(data)),
       },
     }
   } catch (e) {

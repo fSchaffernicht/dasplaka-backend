@@ -16,9 +16,9 @@ export default async function handler(
     const connection = await client
 
     const db = connection.db("food")
-    const recipe = db.collection("recipe")
+    const foods = db.collection("foods")
 
-    await recipe.insertOne(body)
+    await foods.insertOne(body)
 
     res.status(200).json({ success: true })
   } catch (error) {
