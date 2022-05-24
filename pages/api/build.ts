@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import { Response, RESPONSE } from "@types"
+import { client } from "@services"
 
 const buildHookURI = process.env.BUILD_HOOK ?? ""
 
@@ -8,16 +9,23 @@ export default async function handler(
   res: NextApiResponse<Response>
 ) {
   try {
-    const response = await fetch(buildHookURI, {
-      method: "POST",
-      body: JSON.stringify({}),
-    })
+    const connection = await client
 
-    if (response.status === 200) {
-      res.status(200).json([RESPONSE.SUCCESS, "Build has started"])
-    } else {
-      res.status(response.status).json([RESPONSE.ERROR, "Something went wrong"])
-    }
+    const db = connection.db("user")
+    const message = db.collection("info")
+
+    await message.updateOne({}, { $set: { lastDeploy: new Date().toString() } })
+
+    // const response = await fetch(buildHookURI, {
+    //   method: "POST",
+    //   body: JSON.stringify({}),
+    // })
+
+    res.status(200).json([RESPONSE.SUCCESS, "Build has started"])
+    // if (response.status === 200) {
+    // } else {
+    //   res.status(response.status).json([RESPONSE.ERROR, "Something went wrong"])
+    // }
   } catch (error) {
     res.status(500).json([RESPONSE.ERROR, "Something went wrong"])
   }

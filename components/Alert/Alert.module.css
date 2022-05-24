@@ -1,7 +1,8 @@
 .alert {
   color: white;
-  background: grey;
+  background: burlywood;
   display: flex;
+  margin-bottom: 1rem;
 }
 
 .info-block {
@@ -14,9 +15,9 @@
 }
 
 .success {
-  background: green;
+  background: darkseagreen;
 }
 
 .error {
-  background: orangered;
+  background: darkred;
 }
