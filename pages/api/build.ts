@@ -16,16 +16,16 @@ export default async function handler(
 
     await message.updateOne({}, { $set: { lastDeploy: new Date().toString() } })
 
-    // const response = await fetch(buildHookURI, {
-    //   method: "POST",
-    //   body: JSON.stringify({}),
-    // })
+    const response = await fetch(buildHookURI, {
+      method: "POST",
+      body: JSON.stringify({}),
+    })
 
-    res.status(200).json([RESPONSE.SUCCESS, "Build has started"])
-    // if (response.status === 200) {
-    // } else {
-    //   res.status(response.status).json([RESPONSE.ERROR, "Something went wrong"])
-    // }
+    if (response.status === 200) {
+      res.status(200).json([RESPONSE.SUCCESS, "Build has started"])
+    } else {
+      res.status(response.status).json([RESPONSE.ERROR, "Something went wrong"])
+    }
   } catch (error) {
     res.status(500).json([RESPONSE.ERROR, "Something went wrong"])
   }
